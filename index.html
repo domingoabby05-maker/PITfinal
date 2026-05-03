@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Wellmeadows Hospital System</title>
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
+</head>
+<body>
+<aside id="sidebar">
+  <div class="sidebar-logo">
+    <div class="cross"></div>
+    <h1>Wellmeadows<br>Hospital</h1>
+    <p>Edinburgh · Est. 1960</p>
+  </div>
+
+
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <button class="nav-item active" onclick="navigate('dashboard')">
+      <span class="icon">🏥</span> Dashboard
+    </button>
+  </div>
+
+
+  <div class="nav-section">
+    <div class="nav-label">Module 1</div>
+    <button class="nav-item" onclick="navigate('patients')">
+      <span class="icon">👤</span> Patients
+    </button>
+    <button class="nav-item" onclick="navigate('allergies')">
+      <span class="icon">⚠️</span> Allergies
+    </button>
+  </div>
+
+
+  <div class="nav-section">
+    <div class="nav-label">Module 2</div>
+    <button class="nav-item" onclick="navigate('staff')">
+      <span class="icon">👩‍⚕️</span> Staff
+    </button>
+    <button class="nav-item" onclick="navigate('rota')">
+      <span class="icon">📅</span> Weekly Rota
+    </button>
+  </div>
+
+
+  <div class="nav-section">
+    <div class="nav-label">Module 3</div>
+    <button class="nav-item" onclick="navigate('wards')">
+      <span class="icon">🛏️</span> Wards & Beds
+    </button>
+    <button class="nav-item" onclick="navigate('inpatients')">
+      <span class="icon">🏨</span> Inpatients
+    </button>
+    <button class="nav-item" onclick="navigate('outpatients')">
+      <span class="icon">🚶</span> Outpatients
+    </button>
+  </div>
+
+
+  <div class="nav-section">
+    <div class="nav-label">Module 4</div>
+    <button class="nav-item" onclick="navigate('appointments')">
+      <span class="icon">📋</span> Appointments
+    </button>
+    <button class="nav-item" onclick="navigate('medication')">
+      <span class="icon">💊</span> Medication
+    </button>
+    <button class="nav-item" onclick="navigate('supplies')">
+      <span class="icon">📦</span> Supplies
+    </button>
+  </div>
+
+
+  <div class="nav-section">
+    <div class="nav-label">Module 5</div>
+    <button class="nav-item" onclick="navigate('billing')">
+      <span class="icon">💳</span> Billing
+      <span class="badge" id="unpaid-badge">2</span>
+    </button>
+    <button class="nav-item" onclick="navigate('reports')">
+      <span class="icon">📊</span> Reports
+    </button>
+  </div>
+
+
+  <div class="sidebar-footer">
+    <div>Medical Director: Dr. J. Wilson</div>
+    <div style="margin-top:4px">System v2.4 · PostgreSQL</div>
+  </div>
+</aside>
+
+
+<!-- Main -->
+<div id="main">
+  <header id="topbar">
+    <h2 id="page-title">Dashboard</h2>
+    <div class="topbar-stat"><div class="dot dot-green"></div> 17 Wards Active</div>
+    <div class="topbar-stat"><div class="dot dot-amber"></div> 3 Waiting</div>
+    <div class="topbar-stat"><div class="dot dot-red"></div> 2 Unpaid Bills</div>
+  </header>
+
+
+  <div id="content">
+
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="stats-row">
+        <div class="stat-card c-teal">
+          <div class="stat-icon">👤</div>
+          <div class="stat-num">247</div>
+          <div class="stat-label">Total Patients</div>
+          <div class="stat-sub"><span style="color:var(--teal3)">↑ 12</span> <span style="color:var(--text3)">this month</span></div>
+        </div>
+        <div class="stat-card c-gold">
+          <div class="stat-icon">🛏️</div>
+          <div class="stat-num">183</div>
+          <div class="stat-label">Beds Occupied</div>
+          <div class="stat-sub"><span style="color:var(--gold2)">76%</span> <span style="color:var(--text3)">of 240 total</span></div>
+        </div>
+        <div class="stat-card c-blue">
+          <div class="stat-icon">👩‍⚕️</div>
+          <div class="stat-num">58</div>
+          <div class="stat-label">Active Staff</div>
+          <div class="stat-sub"><span style="color:#85C8F5">12</span> <span style="color:var(--text3)">on night shift</span></div>
+        </div>
+        <div class="stat-card c-red">
+          <div class="stat-icon">💳</div>
+          <div class="stat-num">£5,950</div>
+          <div class="stat-label">Outstanding Bills</div>
+          <div class="stat-sub"><span style="color:var(--red2)">2</span> <span style="color:var(--text3)">unpaid accounts</span></div>
+        </div>
+      </div>
+
+
+      <div class="dash-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <span>🏥</span>
+            <span class="panel-title">Ward Occupancy</span>
+            <button class="btn btn-ghost btn-sm" onclick="navigate('wards')">View All</button>
+          </div>
+          <div class="panel-body">
+            <table class="data-table">
+              <thead><tr><th>Ward</th><th>Location</th><th>Beds</th><th>Occupancy</th></tr></thead>
+              <tbody id="ward-occ-list"></tbody>
+            </table>
+          </div>
+        </div>
+
+
+        <div class="panel">
+          <div class="panel-header">
+            <span>🕐</span>
+            <span class="panel-title">Recent Activity</span>
+          </div>
+          <div class="timeline" id="activity-feed"></div>
+        </div>
+      </div>
+
+
+      <div class="dash-grid-3">
+        <div class="panel">
+          <div class="panel-header"><span>⏳</span><span class="panel-title">Waiting List</span></div>
+          <div class="panel-body">
+            <table class="data-table">
+              <thead><tr><th>Patient</th><th>Ward</th><th>Days</th></tr></thead>
+              <tbody id="waiting-list-dash"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span>💊</span><span class="panel-title">Low Stock Alert</span></div>
+          <div class="panel-body">
+            <table class="data-table">
+              <thead><tr><th>Item</th><th>Stock</th><th>Reorder</th></tr></thead>
+              <tbody id="stock-alert-list"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span>📋</span><span class="panel-title">Today's Appointments</span></div>
+          <div class="panel-body">
+            <table class="data-table">
+              <thead><tr><th>Patient</th><th>Time</th><th>Room</th></tr></thead>
+              <tbody id="appt-dash"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- PATIENTS -->
+    <div id="page-patients" class="page">
+      <div class="section-title">Patient Registry</div>
+      <div class="section-sub">All registered patients — Module 1</div>
+      <div class="toolbar">
+        <div class="search-box">🔍 <input type="text" placeholder="Search by name or patient number..." oninput="filterTable('patient-table', this.value)"/></div>
+        <select class="filter-select" onchange="filterTable('patient-table', '', this.value, 5)">
+          <option value="">All Status</option>
+          <option value="Inpatient">Inpatient</option>
+          <option value="Outpatient">Outpatient</option>
+          <option value="Waiting">Waiting</option>
+          <option value="Discharged">Discharged</option>
+        </select>
+        <button class="btn btn-primary" onclick="openModal('modal-add-patient')">+ Add Patient</button>
+      </div>
+      <div class="panel">
+        <table class="data-table" id="patient-table">
+          <thead><tr><th>Patient No</th><th>Name</th><th>DOB</th><th>Sex</th><th>Contact</th><th>Doctor</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="patient-list"></tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- ALLERGIES -->
+    <div id="page-allergies" class="page">
+      <div class="section-title">Patient Allergies</div>
+      <div class="section-sub">Allergy records — independent of admission status</div>
+      <div class="toolbar">
+        <div class="search-box">🔍 <input type="text" placeholder="Search patient or allergen..." oninput="filterTable('allergy-table', this.value)"/></div>
+        <select class="filter-select" onchange="filterTable('allergy-table', '', this.value, 4)">
+          <option value="">All Severity</option>
+          <option value="Mild">Mild</option>
+          <option value="Moderate">Moderate</option>
+          <option value="Severe">Severe</option>
+        </select>
+        <button class="btn btn-primary" onclick="openModal('modal-add-allergy')">+ Add Allergy</button>
+      </div>
+      <div class="panel">
+        <table class="data-table" id="allergy-table">
+          <thead><tr><th>Patient</th><th>Allergen</th><th>Reaction</th><th>Severity</th><th>Date Recorded</th><th>Recorded By</th></tr></thead>
+          <tbody id="allergy-list"></tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- STAFF -->
+    <div id="page-staff" class="page">
+      <div class="section-title">Staff Management</div>
+      <div class="section-sub">All hospital personnel — Module 2</div>
+      <div class="toolbar">
+        <div class="search-box">🔍 <input type="text" placeholder="Search staff..." oninput="filterTable('staff-table', this.value)"/></div>
+        <select class="filter-select" onchange="filterTable('staff-table', '', this.value, 2)">
+          <option value="">All Positions</option>
+          <option value="Charge Nurse">Charge Nurse</option>
+          <option value="Staff Nurse">Staff Nurse</option>
+          <option value="Nurse">Nurse</option>
+          <option value="Consultant">Consultant</option>
+          <option value="Doctor">Doctor</option>
+        </select>
+        <button class="btn btn-primary" onclick="openModal('modal-add-staff')">+ Add Staff</button>
+      </div>
+      <div class="panel">
+        <table class="data-table" id="staff-table">
+          <thead><tr><th>Staff No</th><th>Name</th><th>Position</th><th>Ward</th><th>Contract</th><th>Salary</th><th>NIN</th></tr></thead>
+          <tbody id="staff-list"></tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- ROTA -->
+    <div id="page-rota" class="page">
+      <div class="section-title">Weekly Staff Rota</div>
+      <div class="section-sub">Week beginning 9-Jan-1996 · Ward 11 Orthopaedic</div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>📅</span>
+          <span class="panel-title">Ward 11 — Orthopaedic · Charge Nurse: Moira Samuel</span>
+          <button class="btn btn-gold btn-sm" onclick="openModal('modal-add-rota')">+ Assign Shift</button>
+        </div>
+        <table class="data-table" id="rota-table">
+          <thead><tr><th>Staff No</th><th>Name</th><th>Position</th><th>Shift</th><th>Week Starting</th></tr></thead>
+          <tbody id="rota-list"></tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- WARDS -->
+    <div id="page-wards" class="page">
+      <div class="section-title">Wards & Beds</div>
+      <div class="section-sub">Bed management and ward occupancy — Module 3</div>
+      <div id="wards-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;"></div>
+    </div>
+
+
+    <!-- INPATIENTS -->
+    <div id="page-inpatients" class="page">
+      <div class="section-title">Inpatients</div>
+      <div class="section-sub">Admitted patients and waiting list — Module 3</div>
+      <div class="toolbar">
+        <div class="search-box">🔍 <input type="text" placeholder="Search patient..." oninput="filterTable('inpatient-table', this.value)"/></div>
+        <select class="filter-select" onchange="filterTable('inpatient-table','',this.value,6)">
+          <option value="">All</option>
+          <option value="Admitted">Admitted</option>
+          <option value="Waiting">Waiting</option>
+          <option value="Discharged">Discharged</option>
+        </select>
+        <button class="btn btn-primary" onclick="openModal('modal-admit')">+ Admit Patient</button>
+      </div>
+      <div class="panel">
+        <table class="data-table" id="inpatient-table">
+          <thead><tr><th>Patient</th><th>Ward</th><th>Bed</th><th>Waiting Since</th><th>Date Placed</th><th>Expected Leave</th><th>Status</th></tr></thead>
+          <tbody id="inpatient-list"></tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- OUTPATIENTS -->
+    <div id="page-outpatients" class="page">
+      <div class="section-title">Outpatients</div>
+      <div class="section-sub">Clinic visit appointments — Module 3</div>
+      <div class="toolbar">
+        <div class="search-box">🔍 <input type="text" placeholder="Search patient..." oninput="filterTable('outpatient-table', this.value)"/></div>
+        <button class="btn btn-primary" onclick="openModal('modal-add-outpatient')">+ Register Outpatient Visit</button>
+      </div>
+      <div class="panel">
+        <table class="data-table" id="outpatient-table">
+          <thead><tr><th>Patient No</th><th>Name</th><th>Appointment Date</th><th>Time</th><th>Status</th></tr></thead>
+          <tbody id="outpatient-list"></tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- APPOINTMENTS -->
+    <div id="page-appointments" class="page">
+      <div class="section-title">Appointments</div>
+      <div class="section-sub">Consultant examinations — Module 4</div>
+      <div class="toolbar">
+        <div class="search-box">🔍 <input type="text" placeholder="Search patient or consultant..." oninput="filterTable('appt-table', this.value)"/></div>
+        <button class="btn btn-primary" onclick="openModal('modal-add-appt')">+ Book Appointment</button>
+      </div>
+      <div class="panel">
+        <table class="data-table" id="appt-table">
+          <thead><tr><th>Appt No</th><th>Patient</th><th>Consultant</th><th>Date & Time</th><th>Room</th><th>Outcome</th></tr></thead>
+          <tbody id="appt-list"></tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- MEDICATION -->
+    <div id="page-medication" class="page">
+      <div class="section-title">Patient Medication</div>
+      <div class="section-sub">Prescription records — Module 4</div>
+      <div class="toolbar">
+        <div class="search-box">🔍 <input type="text" placeholder="Search patient or drug..." oninput="filterTable('med-table', this.value)"/></div>
+        <button class="btn btn-primary" onclick="openModal('modal-add-med')">+ Prescribe</button>
+      </div>
+      <div class="panel">
+        <table class="data-table" id="med-table">
+          <thead><tr><th>Patient</th><th>Drug</th><th>Dosage</th><th>Method</th><th>Units/Day</th><th>Start</th><th>End</th><th>Status</th></tr></thead>
+          <tbody id="med-list"></tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- SUPPLIES -->
+    <div id="page-supplies" class="page">
+      <div class="section-title">Supplies Inventory</div>
+      <div class="section-sub">Surgical, non-surgical & pharmaceutical stock — Module 4</div>
+      <div class="toolbar">
+        <div class="search-box">🔍 <input type="text" placeholder="Search item..." oninput="filterTable('supply-table', this.value)"/></div>
+        <select class="filter-select" onchange="filterTable('supply-table','',this.value,1)">
+          <option value="">All Types</option>
+          <option value="Surgical">Surgical</option>
+          <option value="Non-surgical">Non-surgical</option>
+          <option value="Pharmaceutical">Pharmaceutical</option>
+        </select>
+      </div>
+      <div class="panel">
+        <table class="data-table" id="supply-table">
+          <thead><tr><th>Item No</th><th>Name</th><th>Type</th><th>Stock</th><th>Reorder Level</th><th>Cost/Unit</th><th>Status</th></tr></thead>
+          <tbody id="supply-list"></tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- BILLING -->
+    <div id="page-billing" class="page">
+      <div class="section-title">Billing & Payments</div>
+      <div class="section-sub">Patient invoices and payment tracking — Module 5</div>
+      <div class="toolbar">
+        <div class="search-box">🔍 <input type="text" placeholder="Search patient or bill..." oninput="filterTable('bill-table', this.value)"/></div>
+        <select class="filter-select" onchange="filterTable('bill-table','',this.value,4)">
+          <option value="">All Status</option>
+          <option value="Unpaid">Unpaid</option>
+          <option value="Partial">Partial</option>
+          <option value="Paid">Paid</option>
+        </select>
+        <button class="btn btn-primary" onclick="openModal('modal-add-bill')">+ Generate Bill</button>
+      </div>
+      <div class="panel">
+        <table class="data-table" id="bill-table">
+          <thead><tr><th>Bill ID</th><th>Patient</th><th>Bill Date</th><th>Due Date</th><th>Total</th><th>Paid</th><th>Outstanding</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="bill-list"></tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <!-- REPORTS -->
+    <div id="page-reports" class="page">
+      <div class="section-title">Reports & Analytics</div>
+      <div class="section-sub">Hospital management summaries — Module 5</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <div class="panel" style="cursor:pointer" onclick="showReport('occupancy')">
+          <div class="panel-header"><span>🏥</span><span class="panel-title">Ward Occupancy Report</span></div>
+          <div style="padding:16px;font-size:13px;color:var(--text3)">Occupied vs vacant beds per ward for current period.</div>
+        </div>
+        <div class="panel" style="cursor:pointer" onclick="showReport('revenue')">
+          <div class="panel-header"><span>💰</span><span class="panel-title">Revenue Summary</span></div>
+          <div style="padding:16px;font-size:13px;color:var(--text3)">Total billed, collected and outstanding by month.</div>
+        </div>
+        <div class="panel" style="cursor:pointer" onclick="showReport('patients')">
+          <div class="panel-header"><span>👤</span><span class="panel-title">Patient Records Report</span></div>
+          <div style="padding:16px;font-size:13px;color:var(--text3)">Complete patient listing with admission history.</div>
+        </div>
+        <div class="panel" style="cursor:pointer" onclick="showReport('medication')">
+          <div class="panel-header"><span>💊</span><span class="panel-title">Medication Usage Report</span></div>
+          <div style="padding:16px;font-size:13px;color:var(--text3)">Drug consumption and cost analysis per patient.</div>
+        </div>
+      </div>
+      <div id="report-output" class="panel" style="display:none">
+        <div class="panel-header">
+          <span id="report-icon">📊</span>
+          <span class="panel-title" id="report-title">Report</span>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('report-output').style.display='none'">✕ Close</button>
+        </div>
+        <div id="report-body" style="padding:20px;"></div>
+      </div>
+    </div>
+
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+
+<!-- ============ MODALS ============ -->
+
+
+<!-- Add Patient -->
+<div class="modal-overlay" id="modal-add-patient">
+  <div class="modal">
+    <div class="modal-header">
+      <span>👤</span><h3>Register New Patient</h3>
+      <button class="modal-close" onclick="closeModal('modal-add-patient')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>First Name</label><input type="text" id="p-fname" placeholder="Anne"/></div>
+        <div class="form-group"><label>Last Name</label><input type="text" id="p-lname" placeholder="Phelps"/></div>
+        <div class="form-group span2"><label>Address</label><input type="text" id="p-addr" placeholder="44 North Bridges, Edinburgh EH1 5GH"/></div>
+        <div class="form-group"><label>Telephone</label><input type="text" id="p-tel" placeholder="0131-332-4111"/></div>
+        <div class="form-group"><label>Date of Birth</label><input type="date" id="p-dob"/></div>
+        <div class="form-group"><label>Sex</label>
+          <select id="p-sex"><option value="F">Female</option><option value="M">Male</option></select>
+        </div>
+        <div class="form-group"><label>Marital Status</label>
+          <select id="p-marital"><option>Single</option><option>Married</option><option>Widowed</option><option>Divorced</option></select>
+        </div>
+        <div class="form-group"><label>Local Doctor</label>
+          <select id="p-doc"><option value="CLN001">Dr. Helen Pearson</option><option value="CLN002">Dr. James Whitmore</option></select>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div style="font-size:12px;font-weight:500;color:var(--text3);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em">Next of Kin</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Full Name</label><input type="text" id="p-nok-name" placeholder="James Phelps"/></div>
+        <div class="form-group"><label>Relationship</label><input type="text" id="p-nok-rel" placeholder="Father"/></div>
+        <div class="form-group"><label>Telephone</label><input type="text" id="p-nok-tel" placeholder="0141-848-2211"/></div>
+        <div class="form-group"><label>Address</label><input type="text" id="p-nok-addr" placeholder="145 Rowlands Street, Paisley"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-patient')">Cancel</button>
+      <button class="btn btn-primary" onclick="addPatient()">Register Patient</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add Allergy -->
+<div class="modal-overlay" id="modal-add-allergy">
+  <div class="modal">
+    <div class="modal-header"><span>⚠️</span><h3>Record Allergy</h3><button class="modal-close" onclick="closeModal('modal-add-allergy')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>Patient No</label>
+          <select id="a-patient" style="font-family:var(--font-mono)"></select>
+        </div>
+        <div class="form-group"><label>Allergen</label><input type="text" id="a-allergen" placeholder="e.g. Penicillin, Latex"/></div>
+        <div class="form-group"><label>Reaction Type</label><input type="text" id="a-reaction" placeholder="e.g. Rash, Anaphylaxis"/></div>
+        <div class="form-group"><label>Severity</label>
+          <select id="a-severity"><option>Mild</option><option>Moderate</option><option>Severe</option></select>
+        </div>
+        <div class="form-group span2"><label>Notes</label><textarea id="a-notes" placeholder="Additional details..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-allergy')">Cancel</button>
+      <button class="btn btn-primary" onclick="addAllergy()">Save Allergy</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add Staff -->
+<div class="modal-overlay" id="modal-add-staff">
+  <div class="modal">
+    <div class="modal-header"><span>👩‍⚕️</span><h3>Add Staff Member</h3><button class="modal-close" onclick="closeModal('modal-add-staff')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>First Name</label><input type="text" id="s-fname" placeholder="Moira"/></div>
+        <div class="form-group"><label>Last Name</label><input type="text" id="s-lname" placeholder="Samuel"/></div>
+        <div class="form-group"><label>Position</label>
+          <select id="s-pos"><option>Charge Nurse</option><option>Staff Nurse</option><option>Nurse</option><option>Consultant</option><option>Doctor</option><option>Auxiliary</option></select>
+        </div>
+        <div class="form-group"><label>Ward</label>
+          <select id="s-ward"><option value="11">Ward 11 — Orthopaedic</option><option value="12">Ward 12 — Geriatric</option><option value="13">Ward 13 — Cardiology</option></select>
+        </div>
+        <div class="form-group"><label>NIN</label><input type="text" id="s-nin" placeholder="WB123423D"/></div>
+        <div class="form-group"><label>Current Salary (£)</label><input type="number" id="s-salary" placeholder="18760"/></div>
+        <div class="form-group"><label>Hours/Week</label><input type="number" id="s-hours" placeholder="37.5"/></div>
+        <div class="form-group"><label>Contract Type</label>
+          <select id="s-contract"><option value="P">Permanent</option><option value="T">Temporary</option></select>
+        </div>
+        <div class="form-group"><label>Payment</label>
+          <select id="s-pay"><option value="M">Monthly</option><option value="W">Weekly</option></select>
+        </div>
+        <div class="form-group"><label>Date of Birth</label><input type="date" id="s-dob"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-staff')">Cancel</button>
+      <button class="btn btn-primary" onclick="addStaff()">Add Staff</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add Rota -->
+<div class="modal-overlay" id="modal-add-rota">
+  <div class="modal">
+    <div class="modal-header"><span>📅</span><h3>Assign Shift</h3><button class="modal-close" onclick="closeModal('modal-add-rota')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid cols-1">
+        <div class="form-group"><label>Staff Member</label><select id="r-staff"></select></div>
+        <div class="form-group"><label>Shift</label>
+          <select id="r-shift"><option>Early</option><option>Late</option><option>Night</option></select>
+        </div>
+        <div class="form-group"><label>Week Starting</label><input type="date" id="r-week"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-rota')">Cancel</button>
+      <button class="btn btn-primary" onclick="addRota()">Assign</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Admit Patient -->
+<div class="modal-overlay" id="modal-admit">
+  <div class="modal">
+    <div class="modal-header"><span>🏨</span><h3>Admit Patient</h3><button class="modal-close" onclick="closeModal('modal-admit')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>Patient</label><select id="ip-patient"></select></div>
+        <div class="form-group"><label>Ward Required</label>
+          <select id="ip-ward"><option value="11">Ward 11 — Orthopaedic</option><option value="12">Ward 12 — Geriatric</option><option value="13">Ward 13 — Cardiology</option></select>
+        </div>
+        <div class="form-group"><label>Expected Stay (days)</label><input type="number" id="ip-days" placeholder="14"/></div>
+        <div class="form-group"><label>Assign Bed (leave blank for waiting list)</label>
+          <select id="ip-bed"><option value="">— Waiting List —</option><option value="79">Bed 79</option><option value="80">Bed 80</option><option value="81">Bed 81</option><option value="82">Bed 82</option><option value="83">Bed 83</option><option value="86">Bed 86</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-admit')">Cancel</button>
+      <button class="btn btn-primary" onclick="admitPatient()">Admit</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add Outpatient -->
+<div class="modal-overlay" id="modal-add-outpatient">
+  <div class="modal">
+    <div class="modal-header"><span>🚶</span><h3>Register Outpatient Visit</h3><button class="modal-close" onclick="closeModal('modal-add-outpatient')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>Patient</label><select id="op-patient"></select></div>
+        <div class="form-group"><label>Appointment Date</label><input type="date" id="op-date"/></div>
+        <div class="form-group"><label>Time</label><input type="time" id="op-time"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-outpatient')">Cancel</button>
+      <button class="btn btn-primary" onclick="addOutpatient()">Register</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Add Appointment -->
+<div class="modal-overlay" id="modal-add-appt">
+  <div class="modal">
+    <div class="modal-header"><span>📋</span><h3>Book Appointment</h3><button class="modal-close" onclick="closeModal('modal-add-appt')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>Patient</label><select id="ap-patient"></select></div>
+        <div class="form-group"><label>Consultant</label><select id="ap-consultant"></select></div>
+        <div class="form-group"><label>Date</label><input type="date" id="ap-date"/></div>
+        <div class="form-group"><label>Time</label><input type="time" id="ap-time"/></div>
+        <div class="form-group"><label>Exam Room</label><input type="text" id="ap-room" placeholder="Room E252"/></div>
+        <div class="form-group"><label>Outcome</label>
+          <select id="ap-outcome"><option value="">Pending</option><option>Outpatient</option><option>Inpatient</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-appt')">Cancel</button>
+      <button class="btn btn-primary" onclick="addAppointment()">Book</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Prescribe Medication -->
+<div class="modal-overlay" id="modal-add-med">
+  <div class="modal">
+    <div class="modal-header"><span>💊</span><h3>Prescribe Medication</h3><button class="modal-close" onclick="closeModal('modal-add-med')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>Patient</label><select id="m-patient"></select></div>
+        <div class="form-group"><label>Drug</label>
+          <select id="m-drug"><option value="10223">Morphine 10mg/ml</option><option value="10334">Tetracycline 0.5mg/ml</option><option value="10445">Paracetamol 500mg</option></select>
+        </div>
+        <div class="form-group"><label>Units per Day</label><input type="number" id="m-units" placeholder="50"/></div>
+        <div class="form-group"><label>Method of Admin</label>
+          <select id="m-method"><option>Oral</option><option>IV</option><option>Topical</option><option>Injection</option></select>
+        </div>
+        <div class="form-group"><label>Start Date</label><input type="date" id="m-start"/></div>
+        <div class="form-group"><label>End Date</label><input type="date" id="m-end"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-med')">Cancel</button>
+      <button class="btn btn-primary" onclick="addMedication()">Prescribe</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Generate Bill -->
+<div class="modal-overlay" id="modal-add-bill">
+  <div class="modal">
+    <div class="modal-header"><span>💳</span><h3>Generate Bill</h3><button class="modal-close" onclick="closeModal('modal-add-bill')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group"><label>Patient</label><select id="b-patient"></select></div>
+        <div class="form-group"><label>Bill Type</label>
+          <select id="b-type"><option>Inpatient</option><option>Outpatient</option></select>
+        </div>
+        <div class="form-group"><label>Room Charge (£)</label><input type="number" id="b-room" placeholder="0.00"/></div>
+        <div class="form-group"><label>Medication Charge (£)</label><input type="number" id="b-med" placeholder="0.00"/></div>
+        <div class="form-group"><label>Consultation Charge (£)</label><input type="number" id="b-consult" placeholder="150.00"/></div>
+        <div class="form-group"><label>Supply Charge (£)</label><input type="number" id="b-supply" placeholder="0.00"/></div>
+        <div class="form-group"><label>Due Date</label><input type="date" id="b-due"/></div>
+      </div>
+      <div class="bill-summary">
+        <div class="bill-row"><span>Room</span><span id="bs-room">£0.00</span></div>
+        <div class="bill-row"><span>Medication</span><span id="bs-med">£0.00</span></div>
+        <div class="bill-row"><span>Consultation</span><span id="bs-consult">£0.00</span></div>
+        <div class="bill-row"><span>Supplies</span><span id="bs-supply">£0.00</span></div>
+        <div class="bill-row total"><span>Total</span><span id="bs-total">£0.00</span></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-bill')">Cancel</button>
+      <button class="btn btn-gold" onclick="generateBill()">Generate Bill</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+
+</body>
+</html>
