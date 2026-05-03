@@ -8,10 +8,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ Serve frontend
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ✅ PostgreSQL connection
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
@@ -20,7 +18,6 @@ const pool = new Pool({
   port: 5432,
 });
 
-// ✅ GET all patients
 app.get('/patients', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM patients');
@@ -31,7 +28,6 @@ app.get('/patients', async (req, res) => {
   }
 });
 
-// ✅ ADD patient
 app.post('/patients', async (req, res) => {
   const { first_name, last_name, address, phone } = req.body;
 
